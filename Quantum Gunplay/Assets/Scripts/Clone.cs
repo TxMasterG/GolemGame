@@ -3,24 +3,31 @@ using System.Collections;
 
 public class Clone : Player
 {
-    private ArrayList readInputs = new ArrayList();
-    private int index = 0;
-    private bool init = false;
+	protected ArrayList readInputs = new ArrayList();
+	protected int index = 0;
+	protected bool init = false;
 
-    // Use this for initialization
-    void Start()
-    {
-        rb2d = GetComponent<Rigidbody2D>();
-    }
+	// Use this for initialization
+	void Start()
+	{
+		rb2d = GetComponent<Rigidbody2D>();
+		GetComponent<SpriteRenderer> ().sortingLayerName = "Player";
+		weapon.SendMessage("Initialize", team);
+	}
 
-    void TheStart(ArrayList inputs)
+	void Activate(ArrayList inputs)
     {
         readInputs = inputs;
         init = true;
     }
 
+	void Initialize( int teamInit )
+	{
+		team = teamInit;
+	}
+
     // Update is called once per frame
-    void FixedUpdate()
+	void FixedUpdate()
     {
         if( index < readInputs.Count )
         {
@@ -46,7 +53,7 @@ public class Clone : Player
 
     }
 
-    new public void Die()
+    public override void Die()
     {
         this.gameObject.SetActive(false);
     }

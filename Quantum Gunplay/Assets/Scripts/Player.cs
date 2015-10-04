@@ -6,18 +6,19 @@ public class Player : MonoBehaviour
 
     protected Rigidbody2D rb2d;
     public Weapon weapon;
-    public int moveSpeed = 3;
-    public float turnSpeed = 10;
-    public int health = 1;
+	protected int moveSpeed = 3;
+	protected float turnSpeed = 10;
+	protected int health = 10;
     public int team = 1;
-    public Clone clone;
-    private ArrayList writeInputs;
+	private ArrayList writeInputs;
 
     // Use this for initialization
     void Start()
     {
         rb2d = GetComponent<Rigidbody2D>();
-        writeInputs = new ArrayList();
+		writeInputs = new ArrayList();
+		GetComponent<SpriteRenderer> ().sortingLayerName = "Player";
+		weapon.SendMessage("Initialize", team);
     }
 
     // Update is called once per frame
@@ -64,10 +65,11 @@ public class Player : MonoBehaviour
         }
     }
 
-    public void Die()
+    public virtual void Die()
     {
-        Clone newClone = (Clone)Instantiate(clone, new Vector3(0,0,0), new Quaternion());
-        newClone.SendMessage("TheStart", writeInputs);
+		GameObject newClone = (GameObject)Instantiate(Resources.Load("Clone"), new Vector3(0,0,0), new Quaternion());
+        newClone.SendMessage("Initialize", team);
+		newClone.SendMessage("Activate", writeInputs);
         this.gameObject.SetActive(false);
     }
 }

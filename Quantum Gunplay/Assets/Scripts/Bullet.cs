@@ -4,20 +4,24 @@ using System.Collections;
 public class Bullet : MonoBehaviour
 {
 
-    private Rigidbody2D rb2d;
+	protected Rigidbody2D rb2d;
     public int team = 1;
-    public int damage = 1;
+	protected float damage = 3;
+	protected float fallOff = 0.1f;
+	protected bool init = false;
 
-    // Use this for initialization
-    void Start()
-    {
-
-    }
+	void Initialize(int teamInit)
+	{
+		team = teamInit;
+		init = true;
+	}
 
     // Update is called once per frame
     void Update()
     {
-
+		damage -= fallOff;
+		if( damage <= 0 )
+			Destroy(gameObject);
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -26,13 +30,13 @@ public class Bullet : MonoBehaviour
         {
             Destroy(gameObject);
         }
-        else if (other.tag == "Player")
+		else if (init && other.tag == "Player")
         {
             Player player = other.gameObject.GetComponent<Player>();
             if (player.team != team)
             {
-                player.Damage(damage);
-                this.gameObject.SetActive(false);
+                player.Damage((int)Mathf.Ceil(damage));
+				Destroy(gameObject);
             }
         }
     }
