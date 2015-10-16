@@ -5,7 +5,6 @@ public class Clone : Player
 {
 	protected ArrayList readInputs = new ArrayList();
 	protected int index = 0;
-	protected bool init = false;
 
 	// Use this for initialization
 	void Start()
@@ -20,11 +19,6 @@ public class Clone : Player
         readInputs = inputs;
         init = true;
     }
-
-	void Initialize( int teamInit )
-	{
-		team = teamInit;
-	}
 
     // Update is called once per frame
 	void FixedUpdate()
@@ -48,13 +42,16 @@ public class Clone : Player
         }
         else if( init )
         {
-            this.gameObject.SetActive(false);
+			GameController.instance.SendMessage("CloneDeath", -1);
+			this.gameObject.SetActive(false);
         }
 
     }
 
     public override void Die()
     {
-        this.gameObject.SetActive(false);
+		init = false;
+		GameController.instance.SendMessage("CloneDeath", team);
+		this.gameObject.SetActive(false);
     }
 }

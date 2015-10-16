@@ -11,6 +11,7 @@ public class Player : MonoBehaviour
 	protected int health = 10;
     public int team = 1;
 	private ArrayList writeInputs;
+	protected bool init = false;
 
     // Use this for initialization
     void Start()
@@ -21,39 +22,51 @@ public class Player : MonoBehaviour
 		weapon.SendMessage("Initialize", team);
     }
 
+	void Activate()
+	{
+		init = true;
+	}
+	
+	void Initialize( int teamInit )
+	{
+		team = teamInit;
+	}
+
     // Update is called once per frame
     void FixedUpdate()
     {
-        ArrayList tickInput = new ArrayList();
-        float xVel = Input.GetAxis("Horizontal");
-        float yVel = Input.GetAxis("Vertical");
-        rb2d.velocity = new Vector2(xVel * moveSpeed, yVel * moveSpeed);
-        tickInput.Add(xVel);
-        tickInput.Add(yVel);
-
-        Vector2 mousePos = Input.mousePosition;
-        Vector2 playerPos = Camera.main.WorldToScreenPoint(transform.localPosition);
-        Vector2 offset = new Vector2(mousePos.x - playerPos.x, mousePos.y - playerPos.y);
-        float angle = Mathf.Atan2(offset.y, offset.x) * Mathf.Rad2Deg;
-        tickInput.Add(angle);
-        transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.Euler(0, 0, angle), turnSpeed);
-
-        if (Input.GetKeyDown("e"))
-        {
-
-        }
-
-        if (Input.GetMouseButtonDown(0))
-        {
-            weapon.Fire();
-            tickInput.Add(1);
-        }
-        else
-        {
-            tickInput.Add(0);
-        }
-
-        writeInputs.Add(tickInput);
+        if (init) {
+			ArrayList tickInput = new ArrayList();
+			float xVel = Input.GetAxis("Horizontal");
+			float yVel = Input.GetAxis("Vertical");
+			rb2d.velocity = new Vector2(xVel * moveSpeed, yVel * moveSpeed);
+			tickInput.Add(xVel);
+			tickInput.Add(yVel);
+			
+			Vector2 mousePos = Input.mousePosition;
+			Vector2 playerPos = Camera.main.WorldToScreenPoint(transform.localPosition);
+			Vector2 offset = new Vector2(mousePos.x - playerPos.x, mousePos.y - playerPos.y);
+			float angle = Mathf.Atan2(offset.y, offset.x) * Mathf.Rad2Deg;
+			tickInput.Add(angle);
+			transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.Euler(0, 0, angle), turnSpeed);
+			
+			if (Input.GetKeyDown("e"))
+			{
+				
+			}
+			
+			if (Input.GetMouseButtonDown(0))
+			{
+				weapon.Fire();
+				tickInput.Add(1);
+			}
+			else
+			{
+				tickInput.Add(0);
+			}
+			
+			writeInputs.Add(tickInput);
+		}
     }
 
     public void Damage(int dmg)
@@ -65,11 +78,14 @@ public class Player : MonoBehaviour
         }
     }
 
+	public ArrayList getInputs()
+	{
+		return writeInputs;
+	}
+
     public virtual void Die()
     {
-		GameObject newClone = (GameObject)Instantiate(Resources.Load("Clone"), new Vector3(0,0,0), new Quaternion());
-        newClone.SendMessage("Initialize", team);
-		newClone.SendMessage("Activate", writeInputs);
-        this.gameObject.SetActive(false);
+		init = false;
+		GameController.instance.SendMessage("PlayerDeath", team);
     }
 }
